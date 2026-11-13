@@ -1,0 +1,13 @@
+SILVER AND GOLD — PROTOTIPO 0.1
+
+Contenido:
+- index.html: juego completo
+- manifest.webmanifest y sw.js: soporte PWA/offline
+
+Para instalar en Android:
+1. Publicá estos archivos en un hosting HTTPS (por ejemplo GitHub Pages).
+2. Abrí la URL en Chrome.
+3. Menú ⋮ > Instalar aplicación o Añadir a pantalla de inicio.
+
+También podés abrir index.html localmente para probarlo, pero el modo instalable/offline requiere HTTPS o localhost.
+Los guardados se almacenan en el navegador del dispositivo (localStorage).

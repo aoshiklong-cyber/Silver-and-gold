@@ -1,0 +1,10 @@
+{
+  "name": "Silver and Gold",
+  "short_name": "Silver & Gold",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#111017",
+  "theme_color": "#17151d",
+  "description": "Aventura RPG en el mundo de Silver and Gold",
+  "icons": []
+}

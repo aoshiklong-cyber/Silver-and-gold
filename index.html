@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17151d">
+<meta name="description" content="Silver and Gold — prototipo de aventura RPG">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Silver and Gold</title>
+<style>
+:root{--bg:#111017;--panel:#1d1a26;--panel2:#262131;--gold:#d7b56d;--silver:#b9c5d3;--text:#eeeaf2;--muted:#aaa3b4;--red:#bd6b70;--green:#87b99a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#373047 0,#111017 48%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+header{padding:22px 18px 12px;text-align:center;border-bottom:1px solid #ffffff14}
+.brand{letter-spacing:.22em;color:var(--gold);font-size:.75rem;text-transform:uppercase}
+h1{font-family:Georgia,serif;font-weight:500;letter-spacing:.06em;margin:4px 0;font-size:2rem}
+.sub{color:var(--muted);font-size:.85rem}
+main{max-width:760px;margin:auto;padding:16px 14px 100px}
+.panel{background:linear-gradient(145deg,var(--panel),#191621);border:1px solid #ffffff18;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 8px 28px #0004}
+h2{font:1.35rem Georgia,serif;color:var(--gold);margin:0 0 10px}
+h3{font:1.05rem Georgia,serif;color:var(--silver);margin:14px 0 6px}
+p{margin:8px 0}.muted{color:var(--muted)}.small{font-size:.83rem;color:var(--muted)}
+label{display:block;color:var(--silver);font-size:.88rem;margin:10px 0 4px}
+input,select,textarea{width:100%;background:#100e16;color:var(--text);border:1px solid #51485f;border-radius:10px;padding:12px;font:inherit}
+textarea{min-height:72px;resize:vertical}
+button{background:linear-gradient(135deg,#b58c48,#e2c47e);color:#1a1620;border:0;border-radius:11px;padding:12px 15px;font-weight:700;font-size:.95rem;cursor:pointer;margin:5px 4px 3px 0}
+button.secondary{background:#332d40;color:var(--text);border:1px solid #ffffff24}
+button.ghost{background:transparent;color:var(--silver);border:1px solid #ffffff30}
+button:disabled{opacity:.45}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.choice{background:#282334;border:1px solid #5b5068;color:var(--text);text-align:left;min-height:75px}
+.choice strong{display:block;color:var(--gold)}
+.choice.selected{border-color:var(--gold);background:#3a3040}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}
+.stat{background:#15121c;border-radius:10px;padding:8px;text-align:center}
+.stat b{display:block;color:var(--gold);font-size:1.15rem}
+.stat span{font-size:.72rem;color:var(--muted)}
+.scene-title{font:1.55rem Georgia,serif;color:var(--gold)}
+.scene-text{white-space:pre-line}
+.actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.log{border-left:2px solid var(--gold);padding-left:11px;color:#d5cedc;font-size:.88rem}
+.pill{display:inline-block;border:1px solid #ffffff2b;border-radius:99px;padding:3px 8px;font-size:.72rem;color:var(--silver);margin:2px}
+.hidden{display:none!important}
+footer{position:fixed;bottom:0;left:0;right:0;background:#14111beF;border-top:1px solid #ffffff20;padding:9px max(12px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:8px;backdrop-filter:blur(12px)}
+footer button{margin:0;padding:9px 12px;font-size:.82rem}
+hr{border:0;border-top:1px solid #ffffff18;margin:14px 0}
+@media(min-width:600px){main{padding-top:24px}.grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="brand">Una aventura en el mundo de</div><h1>Silver and Gold</h1><div class="sub">Prototipo jugable · Versión 0.1</div></header>
+<main>
+<section id="setup" class="panel">
+<h2>Comienza tu historia</h2>
+<p class="muted">Las dos lunas observan. El Sol todavía no ha despertado.</p>
+<label>Nombre del personaje</label><input id="charName" maxlength="24" value="Aren" placeholder="Tu nombre">
+<label>Raza</label><div class="grid" id="races"></div>
+<label>Clase</label><div class="grid" id="classes"></div>
+<label>Trasfondo</label><select id="origin"><option value="Viajero">Viajero sin hogar fijo</option><option value="Aprendiz">Aprendiz de un gremio</option><option value="Exiliado">Exiliado de una comunidad</option><option value="Herencia">Heredero de una deuda familiar</option></select>
+<button id="begin">Comenzar aventura</button>
+<p class="small">Tu clase define tus talentos iniciales, no limita lo que podrás aprender.</p>
+</section>
+<section id="game" class="hidden">
+<div class="panel">
+<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div class="brand">Hoja de personaje</div><h2 id="heroName" style="margin:2px 0"></h2><div id="heroMeta" class="small"></div></div><button class="secondary" id="saveBtn">Guardar</button></div>
+<div class="stats" id="stats"></div>
+<div><span class="pill" id="hp"></span><span class="pill" id="xp"></span><span class="pill" id="gold"></span></div>
+<div class="small" id="skills"></div>
+</div>
+<div class="panel">
+<div class="scene-title" id="sceneTitle"></div>
+<p class="scene-text" id="sceneText"></p>
+<div id="sceneTags"></div>
+<div class="actions" id="choices"></div>
+<div id="freeAction" class="hidden"><hr><label>¿Qué intentás hacer?</label><textarea id="freeText" placeholder="Escribí tu acción. El mundo reaccionará según tu personaje y la situación..."></textarea><button id="tryAction">Intentar acción</button></div>
+<div id="feedback" class="log hidden"></div>
+</div>
+<div class="panel"><h3>Diario de viaje</h3><div id="journal" class="small">Tu historia comienza aquí.</div></div>
+</section>
+<section id="end" class="panel hidden"><h2>Fin de esta primera aventura</h2><p id="ending"></p><button id="restart">Volver al comienzo</button></section>
+</main>
+<footer><button class="secondary" id="sheetBtn">Personaje</button><button class="secondary" id="journalBtn">Diario</button><button class="secondary" id="resetBtn">Nueva partida</button></footer>
+<script>
+const raceData={
+"Humano":{desc:"Versátil y adaptable.",stats:{FUE:0,AGI:0,INT:1,VOL:1},skill:"Adaptabilidad"},
+"Elfo Solar":{desc:"Afinidad con la luz y la vitalidad.",stats:{FUE:0,AGI:1,INT:1,VOL:0},skill:"Afinidad solar"},
+"Elfo Dorado":{desc:"Percepción de prosperidad y energía lunar.",stats:{FUE:0,AGI:0,INT:1,VOL:1},skill:"Resonancia dorada"},
+"Elfo Plateado":{desc:"Serenidad, percepción y precisión.",stats:{FUE:0,AGI:1,INT:1,VOL:0},skill:"Percepción lunar"},
+"Bestial":{desc:"Sentidos agudos e instinto.",stats:{FUE:1,AGI:1,INT:0,VOL:0},skill:"Instinto"},
+"Nym":{desc:"Un linaje extraño de origen lejano.",stats:{FUE:0,AGI:0,INT:1,VOL:1},skill:"Eco desconocido"},
+"Enano":{desc:"Resistencia y talento artesanal.",stats:{FUE:1,AGI:0,INT:1,VOL:0},skill:"Oficio rúnico"}
+};
+const classData={
+"Vanguardia":{desc:"Resiste y protege.",stats:{FUE:2,AGI:0,INT:0,VOL:0},skill:"Guardia"},
+"Explorador":{desc:"Rastreo, movilidad y supervivencia.",stats:{FUE:0,AGI:2,INT:0,VOL:0},skill:"Rastreo"},
+"Erudito":{desc:"Conocimiento y lectura de lo arcano.",stats:{FUE:0,AGI:0,INT:2,VOL:0},skill:"Investigación"},
+"Tejedor":{desc:"Percibe y canaliza corrientes mágicas.",stats:{FUE:0,AGI:0,INT:1,VOL:1},skill:"Canalización"},
+"Artífice":{desc:"Ingeniería, runas y tecnomagia enana.",stats:{FUE:0,AGI:0,INT:2,VOL:0},skill:"Ingeniería"}
+};
+let state=null, selectedRace="Humano", selectedClass="Explorador";
+const $=id=>document.getElementById(id);
+function renderOptions(){
+$("races").innerHTML=Object.entries(raceData).map(([n,v])=>`<button class="choice ${n===selectedRace?'selected':''}" data-race="${n}"><strong>${n}</strong><span class="small">${v.desc}</span></button>`).join("");
+$("classes").innerHTML=Object.entries(classData).map(([n,v])=>`<button class="choice ${n===selectedClass?'selected':''}" data-class="${n}"><strong>${n}</strong><span class="small">${v.desc}</span></button>`).join("");
+document.querySelectorAll("[data-race]").forEach(b=>b.onclick=()=>{selectedRace=b.dataset.race;renderOptions()});
+document.querySelectorAll("[data-class]").forEach(b=>b.onclick=()=>{selectedClass=b.dataset.class;renderOptions()});
+}
+renderOptions();
+const scenes={
+start:{title:"El camino de las dos lunas",text:"El anochecer cae sobre Valdoria. Silver derrama una luz fría sobre los tejados, mientras Gold parece una moneda encendida suspendida en el cielo. Llegás a una posada junto al camino. En el patio, una carreta está volcada y su conductor discute con una guardia.\\n\\n«Encontramos esto entre las piedras», dice la guardia. En su mano hay un fragmento oscuro, marcado con tres círculos que se tocan.",choices:[["Hablar con la guardia","guard"],["Examinar el fragmento","relic"],["Ayudar al carretero","cart"],["Entrar en la posada","inn"]],free:true},
+guard:{title:"La guardia de Valdoria",text:"La guardia se presenta como Maela. Está cansada y no confía demasiado en desconocidos. Cuenta que la carreta llegó desde unas ruinas al norte. El conductor asegura haber oído voces bajo tierra.",choices:[["Preguntar por las ruinas","ruins"],["Pedir ver el fragmento","relic"],["Ofrecer ayuda a cambio de información","deal"]],free:true},
+relic:{title:"El fragmento de tres círculos",text:"El objeto está frío, aunque Gold ilumina tu mano. Los tres círculos parecen girar cuando los mirás de reojo. Por un instante sentís tres pulsos distintos: uno cálido, uno sereno y uno insistente. Después, nada.",choices:[["Preguntar a Maela qué sabe","guard"],["Llevarlo a la posada","inn"],["Guardar el fragmento","keep"]],free:true},
+cart:{title:"La carreta volcada",text:"El conductor, Oren, tiene un corte en la frente. Lo ayudás a liberar una rueda atrapada. Entre los sacos hay una caja rota y marcas de garras que no parecen de ningún animal común.",choices:[["Preguntar por las marcas","tracks"],["Revisar la caja","box"],["Volver con Maela","guard"]],free:true},
+inn:{title:"La Posada del Ciervo Azul",text:"El fuego crepita. Una anciana con capa gris observa el fragmento desde una mesa apartada. Cuando tus ojos se cruzan, sonríe como si ya te conociera.\\n\\n«Hay cosas que el mundo olvida por una razón», murmura.",choices:[["Acercarte a la anciana","oldwoman"],["Preguntar por las ruinas","ruins"],["Descansar y recuperar fuerzas","rest"]],free:true},
+deal:{title:"Un trato con Maela",text:"Maela acepta. Si investigás las ruinas y volvés con una explicación, ella se ocupará de que nadie te acuse de robar el fragmento. Te entrega un mapa tosco.",choices:[["Partir hacia las ruinas","ruins"],["Hacer más preguntas","guard"]],free:true},
+ruins:{title:"Las ruinas de Aram",text:"Al norte, las ruinas emergen de la colina como dientes rotos. Hay columnas partidas y una escalera que desciende bajo tierra. Sobre el arco de entrada alguien grabó una frase casi borrada: «Lo que fue uno…»",choices:[["Descender por la escalera","crypt"],["Examinar las inscripciones","inscription"],["Buscar huellas alrededor","tracks"]],free:true},
+tracks:{title:"Huellas en el barro",text:"Las marcas avanzan hacia las ruinas, pero se interrumpen de golpe. No hay huellas de regreso. Tu instinto te dice que algo salió de allí… o que algo nunca salió.",choices:[["Seguir el rastro","crypt"],["Regresar a la posada","inn"]],free:true},
+box:{title:"La caja rota",text:"Encontrás polvo plateado y una pequeña pieza de cobre grabada con un símbolo solar. El conductor no recuerda haber cargado esa caja. Al tocarla, una chispa dorada recorre el metal.",choices:[["Guardar la pieza","keep"],["Preguntar a Oren","cart"],["Ir a las ruinas","ruins"]],free:true},
+oldwoman:{title:"La mujer de la mesa",text:"«No soy una profeta», dice. «Solo he vivido lo suficiente para reconocer una historia que vuelve a empezar». Te habla de una cámara bajo las ruinas y de una puerta que no responde a una sola magia.",choices:[["Preguntar quién es","identity"],["Preguntar por la cámara","crypt"],["Despedirte con respeto","inn"]],free:true},
+identity:{title:"Un nombre que se escapa",text:"La mujer dice llamarse Nara. Un instante después, no estás seguro de haber oído ese nombre. «Los nombres son frágiles», dice. «Recordá mejor lo que elegís hacer».",choices:[["Ir a las ruinas","ruins"],["Preguntar por el Olvido","forget"]],free:true},
+forget:{title:"El susurro del Olvido",text:"Nara baja la mirada. «Hay quienes borran ciudades enteras sin mover una piedra. Si encontrás un lugar donde nadie recuerda qué ocurrió, no pronuncies tu nombre». La conversación termina ahí.",choices:[["Partir hacia las ruinas","ruins"]],free:true},
+inscription:{title:"La inscripción",text:"Con paciencia descifrás parte del texto: «…tres luces, una voluntad; tres voluntades, una herida». El resto fue arrancado de la piedra. Tu conocimiento te permite reconocer que no pertenece a ningún alfabeto moderno.",choices:[["Descender","crypt"],["Volver a la posada","inn"]],free:true},
+rest:{title:"Un descanso necesario",text:"Dormís unas horas. El cansancio desaparece y recuperás fuerzas. En sueños ves tres astros sobre un horizonte sin tierra. Una sombra enorme se parte en tres, pero al despertar no podés recordar su forma.",choices:[["Salir hacia las ruinas","ruins"],["Hablar con la anciana","oldwoman"]],free:true},
+keep:{title:"El objeto guardado",text:"Guardás el fragmento. No sabés qué es, pero sentís que no deberías separarte de él. En tu inventario aparece: Fragmento de tres círculos.",choices:[["Ir a las ruinas","ruins"],["Volver a Maela","guard"],["Entrar en la posada","inn"]],free:true},
+crypt:{title:"La cámara bajo la colina",text:"La escalera termina ante una puerta de piedra. Tres hendiduras forman un triángulo. El fragmento vibra en tu bolsa. Desde el otro lado llega un sonido parecido a una respiración profunda.\\n\\nUna figura cubierta de polvo se incorpora entre las columnas. No parece viva, pero tampoco un cadáver.",choices:[["Hablar con la figura","speak"],["Prepararte para combatir","combat"],["Usar el fragmento en la puerta","door"]],free:true},
+speak:{title:"El custodio",text:"«No busco impedir tu paso», dice la figura. «Busco saber si venís a abrir, a cerrar o a recordar». Su voz suena como piedra arrastrándose.",choices:[["Decir que querés comprender","door"],["Preguntar por la Convergencia","convergence"],["Atacar primero","combat"]],free:true},
+convergence:{title:"Una palabra antigua",text:"La figura inclina la cabeza. «La Convergencia no es una respuesta. Es una pregunta que el mundo todavía no terminó de formular». Luego señala las tres hendiduras.",choices:[["Examinar la puerta","door"],["Atacar al custodio","combat"]],free:true},
+door:{title:"Tres hendiduras",text:"El fragmento encaja en el centro, pero la puerta no se abre. Las tres marcas comienzan a emitir luces distintas. Una voz, quizá tuya, quizá de la piedra, susurra: «No fuerces la unidad. Comprendé la división».",choices:[["Intentar estabilizar las tres luces","final"],["Retirar el fragmento","crypt"]],free:true},
+combat:{title:"El custodio despierta",text:"La figura se mueve con una velocidad imposible. No es un combate mortal: parece estar probando tu determinación. Podés enfrentarlo o buscar una salida.",choices:[["Atacar","attack"],["Esquivar y observar","dodge"],["Intentar hablar de nuevo","speak"]],free:true},
+final:{title:"El eco de tres luces",text:"Las luces se equilibran. La puerta no se abre por completo, pero una grieta deja escapar aire antiguo. Al otro lado ves un mural: tres figuras bajo tres astros y, detrás de ellas, una silueta sin rostro.\\n\\nNo comprendés la escena. Todavía no. Pero algo en el mundo acaba de reconocerte.",choices:[["Cerrar la cámara y regresar","ending"],["Entrar en la grieta","deeper"]],free:false},
+deeper:{title:"Más allá de la puerta",text:"La grieta se ensancha y una corriente de aire apaga tu antorcha. En la oscuridad, tres voces pronuncian tu nombre. No avanzás. No todavía. Hay misterios para los que aún no estás preparado.",choices:[["Regresar con el custodio","ending"]],free:false},
+ending:{title:"Un comienzo, no un final",text:"Volvés a Valdoria con más preguntas que respuestas. Maela escucha tu relato sin interrumpirte. La anciana de la posada ya no está. En el cielo, Silver y Gold siguen su curso.\\n\\nLa gente continuará con sus vidas. Las ruinas seguirán esperando. Y en algún lugar, algo antiguo ha notado tu presencia.",choices:[],free:false}
+};
+function startGame(){
+const race=selectedRace,cl=selectedClass,rs=raceData[race].stats,cs=classData[cl].stats;
+let stats={FUE:2+rs.FUE+cs.FUE,AGI:2+rs.AGI+cs.AGI,INT:2+rs.INT+cs.INT,VOL:2+rs.VOL+cs.VOL};
+state={name:$("charName").value.trim()||"Aren",race,cl,origin:$("origin").value,stats,hp:20,maxhp:20,xp:0,gold:8,level:1,inventory:["Ropa de viaje","Daga sencilla","Raciones x2"],skills:[raceData[race].skill,classData[cl].skill],scene:"start",journal:[],flags:{},turn:0};
+$("setup").classList.add("hidden");$("end").classList.add("hidden");$("game").classList.remove("hidden");render();
+}
+function log(t){state.journal.unshift(t);state.journal=state.journal.slice(0,12);$("journal").innerHTML=state.journal.map(x=>`<div class="log">${esc(x)}</div>`).join("<br>")}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function render(){
+const s=state,sc=scenes[s.scene];$("heroName").textContent=s.name;$("heroMeta").textContent=`${s.race} · ${s.cl} · ${s.origin} · Nivel ${s.level}`;
+$("stats").innerHTML=Object.entries(s.stats).map(([k,v])=>`<div class="stat"><b>${v}</b><span>${({FUE:"Fuerza",AGI:"Agilidad",INT:"Ingenio",VOL:"Voluntad"})[k]}</span></div>`).join("");
+$("hp").textContent=`♥ ${s.hp}/${s.maxhp} PV`;$("xp").textContent=`✦ ${s.xp} XP`;$("gold").textContent=`◈ ${s.gold} monedas`;
+$("skills").textContent="Habilidades: "+s.skills.join(" · ")+" | Inventario: "+s.inventory.join(", ");
+$("sceneTitle").textContent=sc.title;$("sceneText").textContent=sc.text;
+$("sceneTags").innerHTML=`<span class="pill">Silver</span><span class="pill">Gold</span><span class="pill">Valdoria</span>`;
+$("choices").innerHTML=sc.choices.map(([label,id])=>`<button class="choice" data-go="${id}">${label}</button>`).join("");
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>act(b.dataset.go));
+$("freeAction").classList.toggle("hidden",!sc.free);
+$("feedback").classList.add("hidden");
+if(s.scene==="ending"){$("game").classList.add("hidden");$("end").classList.remove("hidden");$("ending").textContent="Has completado el prólogo. Tu partida queda guardada para futuras expansiones."}
+}
+function roll(mod=0){return Math.floor(Math.random()*20)+1+mod}
+function check(stat,diff,success,fail){
+let r=roll(state.stats[stat]);let msg=`Prueba de ${stat}: ${r} contra dificultad ${diff}. `;
+if(r>=diff){msg+=success;state.xp+=3}else{msg+=fail;state.hp=Math.max(1,state.hp-1)}
+log(msg);$("feedback").textContent=msg;$("feedback").classList.remove("hidden");renderStatsOnly();
+}
+function renderStatsOnly(){$("hp").textContent=`♥ ${state.hp}/${state.maxhp} PV`;$("xp").textContent=`✦ ${state.xp} XP`}
+function act(id){
+state.turn++;
+if(id==="rest"){state.hp=state.maxhp;state.xp+=1}
+if(id==="keep"){if(!state.inventory.includes("Fragmento de tres círculos"))state.inventory.push("Fragmento de tres círculos");state.flags.fragment=true}
+if(id==="deal"){state.flags.map=true;state.inventory.push("Mapa tosco de las ruinas")}
+if(id==="door"&&!state.flags.fragment){state.flags.fragment=true;state.inventory.push("Fragmento de tres círculos")}
+if(id==="attack"){check("FUE",12,"Tu golpe hace retroceder al custodio.","El custodio te alcanza. Perdéis el equilibrio.");state.hp=Math.max(1,state.hp-1);id="combat"}
+if(id==="dodge"){check("AGI",11,"Leés el movimiento y encontrás un hueco.","El movimiento te deja sin aire.");id="speak"}
+if(id==="final"){check("VOL",12,"Las tres luces se estabilizan.","La energía te rechaza, pero aprendés de la experiencia.");}
+if(id==="ending"){$("game").classList.add("hidden");$("end").classList.remove("hidden");$("ending").textContent="Has completado el prólogo. Tu historia apenas comienza.";state.scene="ending";save();return}
+if(id==="deeper"){state.xp+=5;log("Te detuviste ante un misterio que todavía no podés resolver.");}
+state.scene=id;render();save();
+}
+$("tryAction").onclick=()=>{
+let t=$("freeText").value.trim();if(!t)return;
+let low=t.toLowerCase(),stat="INT",diff=12,success="Tu idea encuentra una oportunidad. La situación cambia a tu favor.",fail="La situación no responde como esperabas. Tendrás que probar otro enfoque.";
+if(/golpe|atac|peleo|apuñal|fuerza/.test(low)){stat="FUE";diff=13;success="Actuás con decisión y conseguís imponerte por un instante."}
+else if(/esquiv|corro|trepo|salto|sig|escapo/.test(low)){stat="AGI";diff=12;success="Te movés con rapidez y encontrás una ventaja."}
+else if(/convenc|amenaz|calmo|hablo|persuad|pido/.test(low)){stat="VOL";diff=12;success="Tu actitud abre una posibilidad de diálogo."}
+let r=roll(state.stats[stat]),ok=r>=diff;
+let msg=`Acción: “${t}”. Tirada ${stat}: ${r} vs. ${diff}. `+(ok?success:fail);
+if(ok){state.xp+=2;if(/fragment|objeto|piedra|puerta/.test(low))state.flags.fragment=true}else state.hp=Math.max(1,state.hp-1);
+log(msg);$("feedback").textContent=msg;$("feedback").classList.remove("hidden");$("freeText").value="";renderStatsOnly();save();
+};
+function save(){if(!state)return;localStorage.setItem("sg_save",JSON.stringify(state));log("Partida guardada en este dispositivo.")}
+function load(){try{let v=JSON.parse(localStorage.getItem("sg_save"));if(v&&v.name&&scenes[v.scene]){state=v;$("setup").classList.add("hidden");$("game").classList.remove("hidden");render();return true}}catch(e){}return false}
+$("begin").onclick=startGame;$("saveBtn").onclick=()=>{save();alert("Partida guardada.")};
+$("restart").onclick=()=>{localStorage.removeItem("sg_save");state=null;$("end").classList.add("hidden");$("game").classList.add("hidden");$("setup").classList.remove("hidden")};
+$("resetBtn").onclick=()=>{if(confirm("¿Borrar la partida y empezar de nuevo?"))$("restart").click()};
+$("sheetBtn").onclick=()=>{if(state)alert(`${state.name}\n${state.race} ${state.cl}\nPV ${state.hp}/${state.maxhp}\nNivel ${state.level}\n${state.skills.join(", ")}\nInventario: ${state.inventory.join(", ")}`)};
+$("journalBtn").onclick=()=>{if(state)alert(state.journal.join("\n\n")||"Todavía no hay entradas.")};
+if(!load()){$("setup").classList.remove("hidden")}
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script>
+</body></html>
